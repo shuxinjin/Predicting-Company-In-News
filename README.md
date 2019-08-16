@@ -5,5 +5,5 @@ Predicting which company is talked about in a news article. In this, using Flair
 
 Pretrained Flair model used, was trained over the English CoNLL-03 task and can recognize 4 different entity types - Organization being one of them. In this project, we utilized the organization predictions.
 
-Dataset consisted of 992 news articles (all the articles found from goodnewsfinland). The predictions are in file: "company_predictions.csv". Python code for making the predictions is in file: "NER_on_goodnews.py"
+Dataset consisted of 992 news articles (all the articles found from goodnewsfinland). The predictions are in file: "company_predictions.csv". Python code for making the predictions is in file: "NER_on_goodnews.py".
 The Scraped information (containing the text of article) is in folder news_scraper and file goodnews.csv. The scraper built is located at path /news_scraper/news_scraper/spiders/news_spider.py.
