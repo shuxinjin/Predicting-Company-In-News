@@ -6,7 +6,7 @@ import itertools
 import operator
 import os
 import csv
-
+import re
 # # # Predicting what organization/company is talked about in a news article # # # 
 
 # Loading previously scraped good news finland data. (Scraped every news article from the site)
@@ -21,16 +21,38 @@ tagger = SequenceTagger.load('ner')
 
 # creating function for finding the organizations from given sentence
 def sentence_to_org(sentence):
+    Threshold=0.81
     try:
         sentence_tokenized = Sentence(sentence)
         tagger.predict(sentence_tokenized)
         sentence_dict = sentence_tokenized.to_dict(tag_type='ner')
-
+        
         org_names = []
         for entity in sentence_dict['entities']:
-            if entity['type'] == 'ORG':
-                org_names.append(entity['text'])
-        
+            scores=0.0
+            #dict: {'text': 'NBA', 'start_pos': 43, 'end_pos': 46, 'labels': [ORG (0.9879)]}
+            print(entity['labels'])
+            #print(entity['labels'][0])
+            ent=str(entity['labels'][0])
+            #print(' word :'+str( entity['labels']))
+
+            print(ent)
+            if 'ORG' in ent:
+                res=''.join( (re.findall(r'\(.*?\)',ent))[0] )
+                #print((res))
+                res=(res.split('('))[1]
+                #print((res))
+                res=(res.split(')'))[0]
+                #print((res))
+                scores=float( res)
+                if (scores-Threshold)>0:
+                    print('a ORG word :'+entity['text'])
+                    org_names.append(entity['text'])
+                else:
+                    pass
+#             if entity['type'] == 'ORG':
+#                 print('find ORG word :'+entity['text'])
+#                 org_names.append(entity['text'])
         return org_names
     except Exception as e: 
         print(e)
@@ -81,9 +103,11 @@ for index, row in news_data.iterrows():
     # check first 20
     #if index == 10:
     #    break
-    print("Link to article: ", row['link'])
-    print("Article header:  ", row['header'])
-    
+    try:
+        print("Link to article: ", row['link'])
+        print("Article header:  ", str( row['header']))
+    except:
+        pass
     # getting all the company tags from sentence:
     companies = sentence_to_org(row['content'])
     print("all the found company tags: ", companies)
@@ -112,7 +136,8 @@ for index, row in news_data.iterrows():
 
     # saving to csv file the predictions
     row = [row['link'], row['header'], companies, predicted_company]
-    with open(filename, 'a') as csvFile:
+    #add , encoding="utf-8"
+    with open(filename, 'a', encoding="utf-8") as csvFile:
         writer = csv.writer(csvFile)
         writer.writerow(row)
     
